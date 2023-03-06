@@ -13,5 +13,4 @@ read password
 echo "Username: $name, Password: $password."
 
 
-
-tail -f /dev/null
+sleep infinity # tail -f /dev/null
