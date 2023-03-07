@@ -3,6 +3,7 @@
 
 .idea/
 
-src/credentials.py
 
 src/__pycache__/
+
+configure_connection.yaml
