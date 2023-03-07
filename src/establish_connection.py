@@ -30,7 +30,7 @@ class VPNConnector:
 
     def establish_connection(self):
         ip_address = _get_public_ip()
-        if ip_address == KNAPP_VPN_PUB_IP:
+        if ip_address == VPN_PUB_IP:
             self.on_already_connected_by_other_process(ip_address)
 
         self.child_process = pexpect.spawn(OPENVPN_SCRIPT_PATH)
@@ -38,7 +38,7 @@ class VPNConnector:
             self.child_process.logfile = sys.stdout.buffer
 
         print("Starting VPN")
-        self.child_process.expect_exact('[sudo] password for jd: ')
+        self.child_process.expect_exact('[sudo] password for {}: '.format(UBUNTU_USER))
         self.child_process.sendline(SUDO_PW)
         self.child_process.expect_exact('Enter Auth Username: ')
         self.child_process.sendline(USER_NAME)
