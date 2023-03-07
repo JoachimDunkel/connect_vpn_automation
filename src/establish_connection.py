@@ -8,10 +8,10 @@ import re as r
 import yaml
 from resources import *
 
+
 def _get_public_ip():
     d = str(urlopen('http://checkip.dyndns.com/').read())
     return r.compile(r'Address: (\d+\.\d+\.\d+\.\d+)').search(d).group(1)
-
 
 
 class VPNConnector:
@@ -23,7 +23,6 @@ class VPNConnector:
         self.SUDO_PW: str = ""
         self.OPENVPN_SCRIPT_PATH: str = ""
         self.VPN_PUB_IP = ""
-        self.read_credentials()
 
         self.child_process: pexpect.spawn = None
         self.on_read_credentials_failed = on_read_credentials_failed
@@ -58,6 +57,7 @@ class VPNConnector:
         ip_address = _get_public_ip()
         if ip_address == self.VPN_PUB_IP:
             self.on_already_connected_by_other_process(ip_address)
+            return
 
         self.child_process = pexpect.spawn(self.OPENVPN_SCRIPT_PATH)
         if self.debug:
@@ -99,6 +99,6 @@ if __name__ == "__main__":
 
 
     connector = VPNConnector(read_credentials_failed, on_already_connected, on_failure, on_success, debug=True)
-
+    connector.read_credentials()
     connector.establish_connection()
     connector.child_process.wait()
