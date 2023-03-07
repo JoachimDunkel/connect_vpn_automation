@@ -1,0 +1,1 @@
+CREDENTIALS_FILE_NAME = 'configure_connection.yaml'

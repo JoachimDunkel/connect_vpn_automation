@@ -38,6 +38,15 @@ OPENVPN_SCRIPT_PATH: ""
 
 ## TODO 
 
+### Setup gui
+
+Connect with py gui.
+handle connection status changes in the gui
+Make it stay running in the ubuntu top bar.
+Give it the power to stop the connection and so on.
+
+### Security issue
+
 At the moment a `configure_connection.yaml` file has to be added, that is excluded from version control.
 
 This is annoying to setup and forces users to have such a plain text file with their credentials on their hardrive

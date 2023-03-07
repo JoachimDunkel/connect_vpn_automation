@@ -2,17 +2,16 @@ import signal
 import getpass
 import pexpect
 import sys
-import time
 import os
-
 from urllib.request import urlopen
 import re as r
 import yaml
-
+from resources import *
 
 def _get_public_ip():
     d = str(urlopen('http://checkip.dyndns.com/').read())
     return r.compile(r'Address: (\d+\.\d+\.\d+\.\d+)').search(d).group(1)
+
 
 
 class VPNConnector:
@@ -34,12 +33,15 @@ class VPNConnector:
         self.debug = debug
 
     def read_credentials(self):
-        with open('configure_connection.yaml', 'r') as stream:
+
+        credentials_path = os.path.abspath(os.path.join(os.getcwd(), os.pardir)) + "/" + CREDENTIALS_FILE_NAME
+
+        with open(credentials_path, 'r') as stream:
             try:
                 credentials = yaml.safe_load(stream)
 
                 self.VPN_PUB_IP = credentials['VPN_PUB_IP']
-                self.OPENVPN_SCRIPT_PATH = os.path.expanduser('~') + credentials['OPENVPN_SCRIPT_PATH']
+                self.OPENVPN_SCRIPT_PATH = credentials['OPENVPN_SCRIPT_PATH']
                 self.SUDO_PW = credentials['SUDO_PW']
                 self.USER_NAME = credentials['USER_NAME']
                 self.USER_PW = credentials['USER_PW']
