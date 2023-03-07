@@ -1,5 +1,5 @@
 import signal
-
+import getpass
 import pexpect
 import sys
 import time
@@ -7,7 +7,7 @@ import os
 
 from urllib.request import urlopen
 import re as r
-from credentials import *
+import yaml
 
 
 def _get_public_ip():
@@ -16,12 +16,36 @@ def _get_public_ip():
 
 
 class VPNConnector:
-    def __init__(self, on_already_connected_by_other_process, on_connection_failed, on_connection_established, debug=False):
+    def __init__(self, on_read_credentials_failed, on_already_connected_by_other_process, on_connection_failed,
+                 on_connection_established, debug=False):
+
+        self.USER_PW: str = ""
+        self.USER_NAME: str = ""
+        self.SUDO_PW: str = ""
+        self.OPENVPN_SCRIPT_PATH: str = ""
+        self.VPN_PUB_IP = ""
+        self.read_credentials()
+
         self.child_process: pexpect.spawn = None
+        self.on_read_credentials_failed = on_read_credentials_failed
         self.on_already_connected_by_other_process = on_already_connected_by_other_process
         self.on_connection_failed = on_connection_failed
         self.on_connection_established = on_connection_established
         self.debug = debug
+
+    def read_credentials(self):
+        with open('configure_connection.yaml', 'r') as stream:
+            try:
+                credentials = yaml.safe_load(stream)
+
+                self.VPN_PUB_IP = credentials['VPN_PUB_IP']
+                self.OPENVPN_SCRIPT_PATH = os.path.expanduser('~') + credentials['OPENVPN_SCRIPT_PATH']
+                self.SUDO_PW = credentials['SUDO_PW']
+                self.USER_NAME = credentials['USER_NAME']
+                self.USER_PW = credentials['USER_PW']
+
+            except yaml.YAMLError as e:
+                self.on_read_credentials_failed()
 
     def stop_connection(self):
         if self.child_process is not None:
@@ -30,20 +54,20 @@ class VPNConnector:
 
     def establish_connection(self):
         ip_address = _get_public_ip()
-        if ip_address == VPN_PUB_IP:
+        if ip_address == self.VPN_PUB_IP:
             self.on_already_connected_by_other_process(ip_address)
 
-        self.child_process = pexpect.spawn(OPENVPN_SCRIPT_PATH)
+        self.child_process = pexpect.spawn(self.OPENVPN_SCRIPT_PATH)
         if self.debug:
             self.child_process.logfile = sys.stdout.buffer
 
         print("Starting VPN")
-        self.child_process.expect_exact('[sudo] password for {}: '.format(UBUNTU_USER))
-        self.child_process.sendline(SUDO_PW)
+        self.child_process.expect_exact('[sudo] password for {}: '.format(getpass.getuser()))
+        self.child_process.sendline(self.SUDO_PW)
         self.child_process.expect_exact('Enter Auth Username: ')
-        self.child_process.sendline(USER_NAME)
+        self.child_process.sendline(self.USER_NAME)
         self.child_process.expect_exact('Enter Auth Password: ')
-        self.child_process.sendline(USER_PW)
+        self.child_process.sendline(self.USER_PW)
 
         try:
             self.child_process.expect_exact('Initialization Sequence Completed')
@@ -53,18 +77,26 @@ class VPNConnector:
 
 
 if __name__ == "__main__":
-
     def on_success():
         print("SUCCESS - Connection established")
 
+
     def on_failure():
         print("FAILURE - Unable to establish connection.")
+
 
     def on_already_connected(ip_address):
         print("Your public ipv4 is: {} \nSeems like you already connected to the vpn.\nExiting ".format(ip_address))
         exit(-1)
 
-    connector = VPNConnector(on_already_connected, on_failure, on_success, debug=True)
+
+    def read_credentials_failed():
+        print("Can not read credentials. Make sure they are provided as expected in the "
+              "configure_connection.yaml\nExiting")
+        exit(-1)
+
+
+    connector = VPNConnector(read_credentials_failed, on_already_connected, on_failure, on_success, debug=True)
 
     connector.establish_connection()
     connector.child_process.wait()
