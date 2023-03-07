@@ -2,3 +2,7 @@
 .vscode/
 
 .idea/
+
+src/credentials.py
+
+src/__pycache__/
