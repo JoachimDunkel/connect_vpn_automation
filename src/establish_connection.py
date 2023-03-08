@@ -7,11 +7,22 @@ from urllib.request import urlopen
 import re as r
 import yaml
 from resources import *
+import ctypes
+import ctypes.util
+import signal
+import sys
 
+PR_SET_PDEATHSIG = 1
 
 def _get_public_ip():
     d = str(urlopen('http://checkip.dyndns.com/').read())
     return r.compile(r'Address: (\d+\.\d+\.\d+\.\d+)').search(d).group(1)
+
+
+def _set_pdeathsig():
+    libc = ctypes.CDLL(ctypes.util.find_library('c'), use_errno=True)
+    if libc.prctl(PR_SET_PDEATHSIG, signal.SIGKILL) != 0:
+        raise OSError(ctypes.get_errno(), 'SET_PDEATHSIG')
 
 
 class VPNConnector:
@@ -59,7 +70,7 @@ class VPNConnector:
             self.on_already_connected_by_other_process(ip_address)
             return
 
-        self.child_process = pexpect.spawn(self.OPENVPN_SCRIPT_PATH)
+        self.child_process = pexpect.spawn(self.OPENVPN_SCRIPT_PATH, preexec_fn=_set_pdeathsig)
         if self.debug:
             self.child_process.logfile = sys.stdout.buffer
 
