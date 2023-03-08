@@ -3,15 +3,11 @@ import getpass
 import pexpect
 import sys
 import os
-from urllib.request import urlopen
-import re as r
 import yaml
 from resources import *
+from check_ip import get_public_ip
 
 
-def _get_public_ip():
-    d = str(urlopen('http://checkip.dyndns.com/').read())
-    return r.compile(r'Address: (\d+\.\d+\.\d+\.\d+)').search(d).group(1)
 
 
 class VPNConnector:
@@ -54,7 +50,7 @@ class VPNConnector:
             self.child_process.wait()
 
     def establish_connection(self):
-        ip_address = _get_public_ip()
+        ip_address = get_public_ip()
         if ip_address == self.VPN_PUB_IP:
             self.on_already_connected_by_other_process(ip_address)
             return
@@ -97,6 +93,7 @@ if __name__ == "__main__":
               "configure_connection.yaml\nExiting")
         exit(-1)
 
+    print(os.getpid())
 
     connector = VPNConnector(read_credentials_failed, on_already_connected, on_failure, on_success, debug=True)
     connector.read_credentials()
