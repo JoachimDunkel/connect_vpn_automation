@@ -10,9 +10,9 @@ import ctypes
 import ctypes.util
 import signal
 import sys
+from configuration_handler import read_credentials
 
 PR_SET_PDEATHSIG = 1
-
 
 
 def _set_pdeathsig():
@@ -37,23 +37,6 @@ class VPNConnector:
         self.on_connection_failed = on_connection_failed
         self.on_connection_established = on_connection_established
         self.debug = debug
-
-    def read_credentials(self):
-
-        credentials_path = os.path.abspath(os.path.join(os.getcwd(), os.pardir)) + "/" + CREDENTIALS_FILE_NAME
-
-        with open(credentials_path, 'r') as stream:
-            try:
-                credentials = yaml.safe_load(stream)
-
-                self.VPN_PUB_IP = credentials['VPN_PUB_IP']
-                self.OPENVPN_SCRIPT_PATH = credentials['OPENVPN_SCRIPT_PATH']
-                self.SUDO_PW = credentials['SUDO_PW']
-                self.USER_NAME = credentials['USER_NAME']
-                self.USER_PW = credentials['USER_PW']
-
-            except yaml.YAMLError as e:
-                self.on_read_credentials_failed()
 
     def stop_connection(self):
         if self.child_process is not None:
@@ -104,9 +87,7 @@ if __name__ == "__main__":
               "configure_connection.yaml\nExiting")
         exit(-1)
 
-    print(os.getpid())
-
     connector = VPNConnector(read_credentials_failed, on_already_connected, on_failure, on_success, debug=True)
-    connector.read_credentials()
+    read_credentials(connector)
     connector.establish_connection()
     connector.child_process.wait()

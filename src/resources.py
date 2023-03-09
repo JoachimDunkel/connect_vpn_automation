@@ -15,7 +15,4 @@ PROJECT_ROOT_NAME = 'connect_vpn_automation'
 
 PATH_ROOT_DIR = Path(_path_to_project_root(PROJECT_ROOT_NAME))
 PATH_SRC = PATH_ROOT_DIR / 'src'
-PATH_IMAGES = PATH_ROOT_DIR / 'images'
-
-PATH_POWER_BTN_IMG = PATH_IMAGES / 'power_button_icon.png'
-
+PATH_CREDENTIALS_FILE = PATH_ROOT_DIR / CREDENTIALS_FILE_NAME
