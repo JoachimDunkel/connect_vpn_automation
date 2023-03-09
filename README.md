@@ -13,9 +13,9 @@ No login necessary.
 
 ## Setup
 
-Clone the repository.
-
-Add a `configure_connection.yaml` in the directory root. (It should look as follows.)
+When first starting the application it will create a `configure_connection.yaml` in the directory root.
+No connection will be established until not all of it's parameters are properly supplied.
+ (It should look as follows.)
 
 ```yaml
 
@@ -25,7 +25,7 @@ SUDO_PW: ""
 USER_NAME: ""
 USER_PW: ""
 
-# The connected public ipv4 address visible from the outside.
+# The public ipv4 address visible from the outside after connecting with the vpn.
 # This is there to check if a connection was established. Or if you are already connected to the vpn via another ürpces.
 
 VPN_PUB_IP: ""
@@ -36,20 +36,9 @@ OPENVPN_SCRIPT_PATH: ""
 
 ```
 
-## TODO 
-
-### Setup gui
-
-Connect with py gui.
-handle connection status changes in the gui
-Make it stay running in the ubuntu top bar.
-Give it the power to stop the connection and so on.
-
 ### Security issue
 
-At the moment a `configure_connection.yaml` file has to be added, that is excluded from version control.
+At the moment login credentials reside in a plain text file. This is a security issue, obviously. Use this project at your own risk.
 
-This is annoying to setup and forces users to have such a plain text file with their credentials on their hardrive
-(Should be encrypted or secured in some other way.)
 
 

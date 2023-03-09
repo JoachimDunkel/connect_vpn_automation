@@ -1,15 +1,12 @@
-import signal
-import getpass
-import pexpect
-import sys
-import os
-import yaml
-from resources import *
-from check_ip import get_public_ip
 import ctypes
 import ctypes.util
+import getpass
 import signal
 import sys
+
+import pexpect
+
+from check_ip import get_public_ip
 from configuration_handler import read_credentials
 
 PR_SET_PDEATHSIG = 1
