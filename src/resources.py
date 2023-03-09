@@ -21,4 +21,4 @@ PATH_HOME_DIR = Path(os.path.expanduser('~'))
 
 PATH_BASH_ALIASES = PATH_HOME_DIR / '.bash_aliases'
 
-PATH_CONNECT_VPN = PATH_ROOT_DIR / 'connect_vpn.py'
+PATH_CONNECT_VPN = PATH_ROOT_DIR / 'connect_vpn.bash'

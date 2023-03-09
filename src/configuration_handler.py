@@ -1,4 +1,4 @@
-import src.resources as res
+import resources as res
 import os
 import yaml
 
