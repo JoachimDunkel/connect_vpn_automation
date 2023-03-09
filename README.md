@@ -13,6 +13,13 @@ No login necessary.
 
 ## Setup
 
+Clone the repository.
+
+Change to the project directory and run:
+```shell
+pip install -r requirements.txt
+```
+
 When first starting the application it will create a `configure_connection.yaml` in the directory root.
 No connection will be established until not all of it's parameters are properly supplied.
  (It should look as follows.)
