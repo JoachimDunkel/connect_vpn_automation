@@ -8,8 +8,7 @@ but these usually do not work if connecting to the network is done via a bash sc
 
 This solution is especially tailored to this use case.
 
-After the application is properly setup, (See Section Setup) connecting to such a company vpn can then be done with one click and the connection stays open and can be monitored with an icon in the top bar.
-No login necessary.
+After the application is properly setup, (See Section Setup) connecting to such a company vpn can then be done with one command.
 
 ## Setup
 
@@ -18,6 +17,11 @@ Clone the repository.
 Change to the project directory and run:
 ```shell
 pip install -r requirements.txt
+```
+
+Run the setup script:
+```shell
+python3 src/one_time_setup.py
 ```
 
 When first starting the application it will create a `configure_connection.yaml` in the directory root.

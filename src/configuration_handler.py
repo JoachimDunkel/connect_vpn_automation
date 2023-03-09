@@ -1,4 +1,4 @@
-import resources
+import src.resources as res
 import os
 import yaml
 
@@ -7,14 +7,14 @@ _CONFIGURATION_FORMAT = {
     'USER_NAME': '',
     'USER_PW': '',
     'VPN_PUB_IP': '',
-    'OPENVPN_SCRIPT_PATH': ''
+    'OPENVPN_SCRIPT_PATH': '~/bin/ovpn-KNAPP-AG_GRAZ'
 }
 
 
-def _ensure_configuration_exists():
+def ensure_configuration_exists():
     created_anew = False
-    if not os.path.exists(str(resources.PATH_CREDENTIALS_FILE)):
-        with open(resources.PATH_CREDENTIALS_FILE, 'w') as file:
+    if not os.path.exists(str(res.PATH_CREDENTIALS_FILE)):
+        with open(res.PATH_CREDENTIALS_FILE, 'w') as file:
             yaml.dump(_CONFIGURATION_FORMAT, file)
 
         created_anew = True
@@ -25,20 +25,20 @@ def _ensure_config_value_provided(source_param, failure_msg):
 
     if source_param == '':
         print("All parameters in {} need correct values in order for this login automation to work properly.\n{}"
-              .format(resources.PATH_CREDENTIALS_FILE, failure_msg))
+              .format(res.PATH_CREDENTIALS_FILE, failure_msg))
         exit(-1)
 
     return source_param
 
 
 def read_credentials(vpn_connector):
-    created_anew = _ensure_configuration_exists()
+    created_anew = ensure_configuration_exists()
     if created_anew:
         print("Please fill out all the necessary credentials for your openvpn-login in:\n{}\n".format(
-            resources.PATH_CREDENTIALS_FILE))
+            res.PATH_CREDENTIALS_FILE))
         exit(-1)
 
-    with open(str(resources.PATH_CREDENTIALS_FILE), 'r') as stream:
+    with open(str(res.PATH_CREDENTIALS_FILE), 'r') as stream:
         try:
             credentials = yaml.safe_load(stream)
 

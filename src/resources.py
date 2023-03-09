@@ -16,3 +16,9 @@ PROJECT_ROOT_NAME = 'connect_vpn_automation'
 PATH_ROOT_DIR = Path(_path_to_project_root(PROJECT_ROOT_NAME))
 PATH_SRC = PATH_ROOT_DIR / 'src'
 PATH_CREDENTIALS_FILE = PATH_ROOT_DIR / CREDENTIALS_FILE_NAME
+
+PATH_HOME_DIR = Path(os.path.expanduser('~'))
+
+PATH_BASH_ALIASES = PATH_HOME_DIR / '.bash_aliases'
+
+PATH_CONNECT_VPN = PATH_ROOT_DIR / 'connect_vpn.py'

@@ -6,8 +6,7 @@ import sys
 
 import pexpect
 
-from check_ip import get_public_ip
-from configuration_handler import read_credentials
+from src.check_ip import get_public_ip
 
 PR_SET_PDEATHSIG = 1
 
@@ -65,26 +64,26 @@ class VPNConnector:
             self.on_connection_failed()
 
 
-if __name__ == "__main__":
-    def on_success():
-        print("SUCCESS - Connection established")
-
-
-    def on_failure():
-        print("FAILURE - Unable to establish connection.")
-
-
-    def on_already_connected(ip_address):
-        print("Your public ipv4 is: {} \nSeems like you already connected to the vpn.\nExiting ".format(ip_address))
-        exit(-1)
-
-
-    def read_credentials_failed():
-        print("Can not read credentials. Make sure they are provided as expected in the "
-              "configure_connection.yaml\nExiting")
-        exit(-1)
-
-    connector = VPNConnector(read_credentials_failed, on_already_connected, on_failure, on_success, debug=True)
-    read_credentials(connector)
-    connector.establish_connection()
-    connector.child_process.wait()
+# if __name__ == "__main__":
+#     def on_success():
+#         print("SUCCESS - Connection established")
+#
+#
+#     def on_failure():
+#         print("FAILURE - Unable to establish connection.")
+#
+#
+#     def on_already_connected(ip_address):
+#         print("Your public ipv4 is: {} \nSeems like you already connected to the vpn.\nExiting ".format(ip_address))
+#         exit(-1)
+#
+#
+#     def read_credentials_failed():
+#         print("Can not read credentials. Make sure they are provided as expected in the "
+#               "configure_connection.yaml\nExiting")
+#         exit(-1)
+#
+#     connector = VPNConnector(read_credentials_failed, on_already_connected, on_failure, on_success, debug=True)
+#     read_credentials(connector)
+#     connector.establish_connection()
+#     connector.child_process.wait()

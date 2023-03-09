@@ -1,4 +1,2 @@
-sv_ttk
 pexpect
 pyyaml
-pillow
