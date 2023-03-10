@@ -5,14 +5,15 @@ import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('AppIndicator3', '0.1')
 gi.require_version('Notify', '0.7')
-
 from gi.repository import Gtk as gtk
 from gi.repository import AppIndicator3 as appindicator
 from gi.repository import Notify as notify
 from check_ip import get_public_ip
 import resources
+from resources import ApplicationStatus
 import IP2Location
-
+from establish_connection import ConnectorBackend
+from configuration_handler import read_credentials
 
 class IPInformation:
     def __init__(self):
@@ -40,13 +41,16 @@ class IPInformation:
 
 
 class VPNConnectorApp:
-    def __init__(self):
+    def __init__(self, on_disconnect_vpn, on_connect_vpn):
+        self.on_disconnect_vpn = on_disconnect_vpn
+        self.on_connect_vpn = on_connect_vpn
         self.connect_btn_item = None
-        self.connect_btn_label = None
+        self.perform_connection_change_btn_item = None
         self.separator = None
         self.ip_details_item = None
         self.ip_addr_item = None
         self.menu = None
+        self.application_status = ApplicationStatus.DISCONNECTED
         self.ip_info = IPInformation()
 
         self.APPINDICATOR_ID = 'myappindicator'
@@ -56,6 +60,38 @@ class VPNConnectorApp:
         self.app.set_menu(self.build_app())
         notify.init(self.APPINDICATOR_ID)
 
+    def on_connect(self):
+        self.on_connect_vpn()
+        self.update_ip_information()
+        self.notify_user(resources.ESTABLISHED_CONNECTION_FORMAT.format(self.ip_info.ip_address))
+
+    def notify_user(self, msg):
+        notify.Notification.new(msg, None).show()
+
+    def on_disconnect(self):
+        self.on_disconnect_vpn()
+        self.notify_user(resources.STOPPED_CONNECTION)
+
+    def toggle_vpn_connection(self, btn):
+
+        if self.application_status == ApplicationStatus.DISCONNECTED:
+            self.application_status = ApplicationStatus.CONNECTED
+            self.on_connect()
+            self.perform_connection_change_btn_item.set_label(resources.STOP_CONNECTION)
+
+        else:
+            self.application_status = ApplicationStatus.DISCONNECTED
+            self.on_disconnect()
+            self.perform_connection_change_btn_item.set_label(resources.ESTABLISH_CONNECTION)
+
+        self.connection_status_label = self.application_status.name
+        self.connection_status_menu_item.set_label(self.connection_status_label)
+
+    def update_ip_information(self):
+        self.ip_info.update()
+        self.ip_addr_item.set_label(self.ip_info.get_ip_address())
+        self.ip_details_item.set_label(self.ip_info.get_ip_details())
+
     def build_app(self):
         self.menu = gtk.Menu()
         self.ip_addr_item = gtk.MenuItem(label=self.ip_info.get_ip_address(), sensitive=False)
@@ -63,8 +99,11 @@ class VPNConnectorApp:
 
         self.separator = gtk.SeparatorMenuItem()
 
-        self.connect_btn_label = "Connect"
-        self.connect_btn_item = gtk.MenuItem(self.connect_btn_label)
+        self.connection_status_label = ApplicationStatus.DISCONNECTED.name
+        self.connection_status_menu_item = gtk.MenuItem(label=self.connection_status_label, sensitive=False)
+        self.perform_connection_change_btn_item = gtk.MenuItem(label=resources.ESTABLISH_CONNECTION)
+        self.perform_connection_change_btn_item.connect("activate", self.toggle_vpn_connection)
+
         # TODO when the button is clicked then update the ip information and the connect btn label appropriatly.
         # While transitioning notify that a connection will be established.
         # https://stackoverflow.com/questions/52887891/how-to-periodically-update-gtk3-label-text -> periodically update a label (the ip address) # not necessary maybe.
@@ -72,49 +111,40 @@ class VPNConnectorApp:
 
         self.menu.append(self.ip_addr_item)
         self.menu.append(self.ip_details_item)
+
+        self.menu.append(self.connection_status_menu_item)
         self.menu.append(self.separator)
-        self.menu.append(self.connect_btn_item)
+        self.menu.append(self.perform_connection_change_btn_item)
 
         self.menu.show_all()
         return self.menu
 
 
-# def main():
-#     indicator =
-#     indicator.set_status(appindicator.IndicatorStatus.ACTIVE)
-#     indicator.set_menu(build_menu())
-#     notify.init(APPINDICATOR_ID)
-#     gtk.main()
-#
-# def build_menu():
-#     menu = gtk.Menu()
-#     item_joke = gtk.MenuItem(label='Joke')
-#     item_joke.connect('activate', joke)
-#     menu.append(item_joke)
-#     item_quit = gtk.MenuItem(label='Quit')
-#     item_quit.connect('activate', quit)
-#     menu.append(item_quit)
-#     menu.show_all()
-#     return menu
-#
-# count = 0
-#
-# def fetch_joke():
-#
-#     global count
-#     count += 1
-#     return "You called me {} times.".format(str(count))
-#
-# def joke(_):
-#     notify.Notification.new("<b>Joke</b>", fetch_joke(), None).show()
-#
-# def quit(_):
-#     notify.uninit()
-#     gtk.main_quit()
-
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal.SIG_DFL)
 
-    connector = VPNConnectorApp()
-    # main()
+
+    def on_success():
+        print("SUCCESS - Connection established")
+
+
+    def on_failure():
+        print("FAILURE - Unable to establish connection.")
+
+
+    def on_already_connected(ip_address):
+        print("Your public ipv4 is: {} \nSeems like you already connected to the vpn.\nExiting ".format(ip_address))
+        exit(-1)
+
+
+    def read_credentials_failed():
+        print("Can not read credentials. Make sure they are provided as expected in the "
+              "configure_connection.yaml\nExiting")
+        exit(-1)
+
+
+    connection_backend = ConnectorBackend(read_credentials_failed, on_already_connected, on_failure, on_success)
+    read_credentials(connection_backend)
+    app = VPNConnectorApp(on_disconnect_vpn=connection_backend.stop_connection, on_connect_vpn=connection_backend.establish_connection)
+
     gtk.main()

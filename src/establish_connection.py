@@ -18,7 +18,7 @@ def _set_pdeathsig():
         raise OSError(ctypes.get_errno(), 'SET_PDEATHSIG')
 
 
-class VPNConnector:
+class ConnectorBackend:
     def __init__(self, on_read_credentials_failed, on_already_connected_by_other_process, on_connection_failed,
                  on_connection_established, debug=False):
 
@@ -84,7 +84,7 @@ if __name__ == "__main__":
               "configure_connection.yaml\nExiting")
         exit(-1)
 
-    connector = VPNConnector(read_credentials_failed, on_already_connected, on_failure, on_success, debug=True)
+    connector = ConnectorBackend(read_credentials_failed, on_already_connected, on_failure, on_success, debug=True)
     read_credentials(connector)
     connector.establish_connection()
     connector.child_process.wait()
