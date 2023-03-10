@@ -1,2 +1,5 @@
 pexpect
 pyyaml
+pycairo
+PyGObject
+IP2Location

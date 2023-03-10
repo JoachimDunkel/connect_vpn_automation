@@ -22,3 +22,7 @@ PATH_HOME_DIR = Path(os.path.expanduser('~'))
 PATH_BASH_ALIASES = PATH_HOME_DIR / '.bash_aliases'
 
 PATH_CONNECT_VPN = PATH_ROOT_DIR / 'connect_vpn.bash'
+
+PATH_DATA_DIR = PATH_ROOT_DIR / 'data'
+
+PATH_IP2LOCATION_DB = PATH_DATA_DIR / 'IP2LOCATION-LITE-DB11.BIN'
