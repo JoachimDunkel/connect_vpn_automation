@@ -67,6 +67,7 @@ class VPNConnectorApp:
         self.change_connect_status_info()
 
     def on_disconnected(self):
+        self.update_ip_information()
         self.notify_user(resources.STOPPED_CONNECTION)
         self.perform_connection_change_btn_item.set_label(resources.ESTABLISH_CONNECTION)
         self.application_status = ApplicationStatus.DISCONNECTED
@@ -114,6 +115,7 @@ class VPNConnectorApp:
         self.ip_addr_item.set_label(self.ip_info.get_ip_address())
         self.ip_details_item.set_label(self.ip_info.get_ip_details())
 
+
     def build_app(self):
         self.menu = gtk.Menu()
         self.ip_addr_item = gtk.MenuItem(label=self.ip_info.get_ip_address(), sensitive=False)
@@ -153,7 +155,6 @@ def main():
     connection_backend.setup(app.on_read_credentials_failed, app.on_other_process_holds_connection,
                              app.on_other_connection_failure, app.on_connected, app.on_disconnected)
     connection_backend.check_connection_status(app.ip_info.ip_address)
-
     gtk.main()
 
 
