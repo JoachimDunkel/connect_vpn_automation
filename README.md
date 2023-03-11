@@ -21,7 +21,7 @@ pip install -r requirements.txt
 
 Run the setup script:
 ```shell
-python3 connect_vpn/one_time_setup.py
+./bin/one_time_setup
 ```
 
 When first starting the application it will create a `configure_connection.yaml` in the directory root.
