@@ -55,33 +55,44 @@ class VPNConnectorApp:
         self.app.set_menu(self.build_app())
         notify.init(self.APPINDICATOR_ID)
 
-    def on_connect(self):
-        self.on_connect_vpn()
+    def request_connection(self):
+        self.on_connect_vpn(self.ip_info.ip_address)
+
+    def on_connected(self):
         self.update_ip_information()
         self.notify_user(resources.ESTABLISHED_CONNECTION_FORMAT.format(self.ip_info.ip_address))
+        self.perform_connection_change_btn_item.set_label(resources.STOP_CONNECTION)
+        self.application_status = ApplicationStatus.CONNECTED
+        self.change_connect_status_info()
+
+    def on_disconnected(self):
+        self.notify_user(resources.STOPPED_CONNECTION)
+        self.perform_connection_change_btn_item.set_label(resources.ESTABLISH_CONNECTION)
+        self.application_status = ApplicationStatus.DISCONNECTED
+        self.change_connect_status_info()
 
     @staticmethod
     def notify_user(msg):
         notify.Notification.new(msg, None).show()
 
-    def on_disconnect(self):
+    def request_disconnection(self):
         self.on_disconnect_vpn()
-        self.notify_user(resources.STOPPED_CONNECTION)
+
+    def change_connect_status_info(self):
+        self.connection_status_label = self.application_status.name
+        self.connection_status_menu_item.set_label(self.connection_status_label)
 
     def toggle_vpn_connection(self, btn):
 
         if self.application_status == ApplicationStatus.DISCONNECTED:
-            self.application_status = ApplicationStatus.CONNECTED
-            self.on_connect()
-            self.perform_connection_change_btn_item.set_label(resources.STOP_CONNECTION)
+            self.request_connection()
+
+        elif self.application_status == ApplicationStatus.CONNECTED:
+            self.request_disconnection()
 
         else:
-            self.application_status = ApplicationStatus.DISCONNECTED
-            self.on_disconnect()
-            self.perform_connection_change_btn_item.set_label(resources.ESTABLISH_CONNECTION)
-
-        self.connection_status_label = self.application_status.name
-        self.connection_status_menu_item.set_label(self.connection_status_label)
+            print("Other process holds connection. Aborting program")
+            exit(-1)
 
     def update_ip_information(self):
         self.ip_info.update()
@@ -139,7 +150,8 @@ def main():
     app = VPNConnectorApp(on_disconnect_vpn=connection_backend.stop_connection,
                           on_connect_vpn=connection_backend.establish_connection)
 
-    connection_backend.setup(read_credentials_failed, on_already_connected, on_failure, on_success)
+    connection_backend.setup(read_credentials_failed, on_already_connected,
+                             on_failure, app.on_connected, app.on_disconnected)
     connection_backend.check_connection_status(app.ip_info.ip_address)
 
     gtk.main()

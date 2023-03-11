@@ -30,18 +30,20 @@ class ConnectorBackend:
         self.debug = debug
 
     def setup(self, on_read_credentials_failed, on_already_connected_by_other_process,
-              on_connection_failed, on_connection_established):
+              on_connection_failed, on_connection_established, on_connection_stopped):
 
         self.on_read_credentials_failed = on_read_credentials_failed
         self.on_already_connected_by_other_process = on_already_connected_by_other_process
         self.on_connection_failed = on_connection_failed
         self.on_connection_established = on_connection_established
+        self.on_connection_stopped = on_connection_stopped
 
     def stop_connection(self):
         if self.child_process is not None:
             self.child_process.kill(signal.SIGTERM)
             self.child_process.wait()
             self.child_process = None
+        self.on_connection_stopped()
 
     def establish_connection(self, curr_ip):
         self.check_connection_status(curr_ip)
