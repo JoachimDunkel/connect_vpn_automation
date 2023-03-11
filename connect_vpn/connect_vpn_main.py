@@ -1,5 +1,5 @@
-import os
 import signal
+
 import gi
 
 gi.require_version('Gtk', '3.0')
@@ -8,38 +8,12 @@ gi.require_version('Notify', '0.7')
 from gi.repository import Gtk as gtk
 from gi.repository import AppIndicator3 as appindicator
 from gi.repository import Notify as notify
-from gi.repository import GLib
-from .check_ip import get_public_ip
+
 from . import resources
 from .resources import ApplicationStatus
-import IP2Location
 from .establish_connection import ConnectorBackend
 from .configuration_handler import read_credentials
-
-
-class IPInformation:
-    def __init__(self):
-        self.city = ""
-        self.region = ""
-        self.ip_address = ""
-        self.country_code = ""
-
-        self._ip2_loc_db = IP2Location.IP2Location()
-        self._ip2_loc_db.open(str(resources.PATH_IP2LOCATION_DB))
-        self.update()
-
-    def update(self):
-        self.ip_address = get_public_ip()
-        ip_record = self._ip2_loc_db.get_all(self.ip_address)
-        self.country_code = ip_record.country_short
-        self.region = ip_record.region
-        self.city = ip_record.city
-
-    def get_ip_details(self):
-        return "{}, {}, {}".format(self.country_code, self.region, self.city)
-
-    def get_ip_address(self):
-        return "IP: {}".format(self.ip_address)
+from .ip_info import IPInformation
 
 
 class VPNConnectorApp:
