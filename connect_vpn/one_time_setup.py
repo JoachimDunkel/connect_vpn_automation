@@ -1,6 +1,6 @@
 # This will add the command connect_vpn to ~/.bash_aliases
 # If running connect_vpn does not work yet resource your terminal or make sure bash_aliases is uncommented in your ~/.bashrc
-import resources
+from . import resources
 from configuration_handler import ensure_configuration_exists
 
 print("Creating the configuration for you to fill out.")

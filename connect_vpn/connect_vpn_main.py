@@ -8,12 +8,13 @@ gi.require_version('Notify', '0.7')
 from gi.repository import Gtk as gtk
 from gi.repository import AppIndicator3 as appindicator
 from gi.repository import Notify as notify
-from check_ip import get_public_ip
-import resources
-from resources import ApplicationStatus
+from .check_ip import get_public_ip
+from . import resources
+from .resources import ApplicationStatus
 import IP2Location
-from establish_connection import ConnectorBackend
-from configuration_handler import read_credentials
+from .establish_connection import ConnectorBackend
+from .configuration_handler import read_credentials
+
 
 class IPInformation:
     def __init__(self):
@@ -44,12 +45,6 @@ class VPNConnectorApp:
     def __init__(self, on_disconnect_vpn, on_connect_vpn):
         self.on_disconnect_vpn = on_disconnect_vpn
         self.on_connect_vpn = on_connect_vpn
-        self.connect_btn_item = None
-        self.perform_connection_change_btn_item = None
-        self.separator = None
-        self.ip_details_item = None
-        self.ip_addr_item = None
-        self.menu = None
         self.application_status = ApplicationStatus.DISCONNECTED
         self.ip_info = IPInformation()
 
@@ -65,7 +60,8 @@ class VPNConnectorApp:
         self.update_ip_information()
         self.notify_user(resources.ESTABLISHED_CONNECTION_FORMAT.format(self.ip_info.ip_address))
 
-    def notify_user(self, msg):
+    @staticmethod
+    def notify_user(msg):
         notify.Notification.new(msg, None).show()
 
     def on_disconnect(self):
@@ -120,31 +116,33 @@ class VPNConnectorApp:
         return self.menu
 
 
-if __name__ == "__main__":
+def main():
     signal.signal(signal.SIGINT, signal.SIG_DFL)
-
 
     def on_success():
         print("SUCCESS - Connection established")
 
-
     def on_failure():
         print("FAILURE - Unable to establish connection.")
-
 
     def on_already_connected(ip_address):
         print("Your public ipv4 is: {} \nSeems like you already connected to the vpn.\nExiting ".format(ip_address))
         exit(-1)
-
 
     def read_credentials_failed():
         print("Can not read credentials. Make sure they are provided as expected in the "
               "configure_connection.yaml\nExiting")
         exit(-1)
 
-
     connection_backend = ConnectorBackend(read_credentials_failed, on_already_connected, on_failure, on_success)
     read_credentials(connection_backend)
-    app = VPNConnectorApp(on_disconnect_vpn=connection_backend.stop_connection, on_connect_vpn=connection_backend.establish_connection)
+    app = VPNConnectorApp(on_disconnect_vpn=connection_backend.stop_connection,
+                          on_connect_vpn=connection_backend.establish_connection)
+
+    connection_backend.check_connection_status(app.ip_info.ip_address)
 
     gtk.main()
+
+
+if __name__ == "__main__":
+    main()

@@ -3,11 +3,10 @@ import ctypes.util
 import getpass
 import signal
 import sys
-
 import pexpect
 
-from check_ip import get_public_ip
-from configuration_handler import read_credentials
+from .check_ip import get_public_ip
+from .configuration_handler import read_credentials
 
 PR_SET_PDEATHSIG = 1
 
@@ -40,11 +39,8 @@ class ConnectorBackend:
             self.child_process.kill(signal.SIGTERM)
             self.child_process.wait()
 
-    def establish_connection(self):
-        ip_address = get_public_ip()
-        if ip_address == self.VPN_PUB_IP:
-            self.on_already_connected_by_other_process(ip_address)
-            return
+    def establish_connection(self, curr_ip):
+        self.check_connection_status(curr_ip)
 
         self.child_process = pexpect.spawn(self.OPENVPN_SCRIPT_PATH, preexec_fn=_set_pdeathsig)
         if self.debug:
@@ -63,6 +59,11 @@ class ConnectorBackend:
             self.on_connection_established()
         except Exception as e:
             self.on_connection_failed()
+
+    def check_connection_status(self, curr_ip):
+        if curr_ip == self.VPN_PUB_IP:
+            self.on_already_connected_by_other_process(curr_ip)
+
 
 
 if __name__ == "__main__":

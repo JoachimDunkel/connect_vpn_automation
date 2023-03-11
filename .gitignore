@@ -4,6 +4,6 @@
 .idea/
 
 
-src/__pycache__/
+connect_vpn/__pycache__/
 
 configure_connection.yaml

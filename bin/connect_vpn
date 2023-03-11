@@ -1,0 +1,12 @@
+#!/usr/bin/python
+
+import sys
+from os.path import abspath, dirname, join
+
+try:
+    import connect_vpn
+except ImportError:
+    sys.path.append(abspath(join(dirname(__file__), '..')))
+
+from connect_vpn.connect_vpn_main import main
+main()
