@@ -52,7 +52,6 @@ class ConnectorBackend:
         if self.debug:
             self.child_process.logfile = sys.stdout.buffer
 
-        print("Starting VPN")
         self.child_process.expect_exact('[sudo] password for {}: '.format(getpass.getuser()))
         self.child_process.sendline(self.SUDO_PW)
         self.child_process.expect_exact('Enter Auth Username: ')
@@ -90,8 +89,11 @@ if __name__ == "__main__":
               "configure_connection.yaml\nExiting")
         exit(-1)
 
+    def on_connection_stopped():
+        print("Stopped connection")
 
-    connector = ConnectorBackend(read_credentials_failed, on_already_connected, on_failure, on_success, debug=True)
+    connector = ConnectorBackend(debug=True)
+    connector.setup(read_credentials_failed, on_already_connected, on_failure, on_success, on_connection_stopped)
     read_credentials(connector)
-    connector.establish_connection()
+    connector.establish_connection(get_public_ip())
     connector.child_process.wait()

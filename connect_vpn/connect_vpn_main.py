@@ -72,7 +72,8 @@ class VPNConnectorApp:
         self.change_connect_status_info()
 
     def on_other_process_holds_connection(self):
-        print(resources.OTHER_PROCESS_HOLDS_CONNECTION_FORMAT.format(self.ip_info.ip_address))
+        msg = resources.OTHER_PROCESS_HOLDS_CONNECTION_FORMAT.format(self.ip_info.ip_address)
+        self.notify_user(msg)
         exit(-1)
 
     @staticmethod

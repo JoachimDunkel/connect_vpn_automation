@@ -1,0 +1,25 @@
+#!/usr/bin/python
+
+import sys
+from os.path import abspath, dirname, join
+
+try:
+    import connect_vpn
+except ImportError:
+    sys.path.append(abspath(join(dirname(__file__), '..')))
+
+from connect_vpn import resources
+from connect_vpn.configuration_handler import ensure_configuration_exists
+
+# This will add the command connect_vpn to ~/.bash_aliases If running connect_vpn does not work yet source your
+# terminal or make sure bash_aliases is uncommented in your ~/.bashrc
+
+print("Creating the configuration for you to fill out.")
+ensure_configuration_exists()
+print("Adding 'connect_vpn' command to ~/.bash_aliases")
+
+alias_cmd = '\nalias connect_vpn="python3 {}"'.format(str(resources.PATH_CONNECT_VPN_BINARY))
+with open(str(resources.PATH_BASH_ALIASES), "a") as bash_aliases:
+    bash_aliases.write(alias_cmd)
+
+print("DONE. To run just type 'connect_vpn' into a terminal.")
