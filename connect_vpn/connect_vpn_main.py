@@ -71,6 +71,19 @@ class VPNConnectorApp:
         self.application_status = ApplicationStatus.DISCONNECTED
         self.change_connect_status_info()
 
+    def on_other_process_holds_connection(self):
+        print(resources.OTHER_PROCESS_HOLDS_CONNECTION_FORMAT.format(self.ip_info.ip_address))
+        exit(-1)
+
+    @staticmethod
+    def on_other_connection_failure(exception: Exception):
+        print(resources.OTHER_CONNECTION_FAILURE_FORMAT.format(str(exception)))
+
+    @staticmethod
+    def on_read_credentials_failed():
+        print(resources.READING_CREDENTIALS_FAILED)
+        exit(-1)
+
     @staticmethod
     def notify_user(msg):
         notify.Notification.new(msg, None).show()
@@ -130,28 +143,13 @@ class VPNConnectorApp:
 def main():
     signal.signal(signal.SIGINT, signal.SIG_DFL)
 
-    def on_success():
-        print("SUCCESS - Connection established")
-
-    def on_failure():
-        print("FAILURE - Unable to establish connection.")
-
-    def on_already_connected(ip_address):
-        print("Your public ipv4 is: {} \nSeems like you already connected to the vpn.\nExiting ".format(ip_address))
-        exit(-1)
-
-    def read_credentials_failed():
-        print("Can not read credentials. Make sure they are provided as expected in the "
-              "configure_connection.yaml\nExiting")
-        exit(-1)
-
     connection_backend = ConnectorBackend()
     read_credentials(connection_backend)
     app = VPNConnectorApp(on_disconnect_vpn=connection_backend.stop_connection,
                           on_connect_vpn=connection_backend.establish_connection)
 
-    connection_backend.setup(read_credentials_failed, on_already_connected,
-                             on_failure, app.on_connected, app.on_disconnected)
+    connection_backend.setup(app.on_read_credentials_failed, app.on_other_process_holds_connection,
+                             app.on_other_connection_failure, app.on_connected, app.on_disconnected)
     connection_backend.check_connection_status(app.ip_info.ip_address)
 
     gtk.main()

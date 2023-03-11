@@ -64,7 +64,7 @@ class ConnectorBackend:
             self.child_process.expect_exact('Initialization Sequence Completed')
             self.on_connection_established()
         except Exception as e:
-            self.on_connection_failed()
+            self.on_connection_failed(e)
 
     def check_connection_status(self, curr_ip):
         if curr_ip == self.VPN_PUB_IP:

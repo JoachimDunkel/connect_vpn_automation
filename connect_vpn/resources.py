@@ -34,3 +34,11 @@ STOP_CONNECTION = 'Disconnect from VPN'
 
 ESTABLISHED_CONNECTION_FORMAT = 'Established connection to: {}'
 STOPPED_CONNECTION = 'Stopped vpn connection.'
+
+OTHER_PROCESS_HOLDS_CONNECTION_FORMAT = "Your public ipv4 is: {} \nSeems like you already connected to the " \
+                                        "vpn.\nExiting"
+
+READING_CREDENTIALS_FAILED = "Can not read credentials. Make sure they are provided as expected in the " \
+                             "configure_connection.yaml\nExiting"
+
+OTHER_CONNECTION_FAILURE_FORMAT = "FAILURE - Unable to establish connection.\nException:\n{}"
