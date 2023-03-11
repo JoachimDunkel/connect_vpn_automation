@@ -18,8 +18,7 @@ def _set_pdeathsig():
 
 
 class ConnectorBackend:
-    def __init__(self, on_read_credentials_failed, on_already_connected_by_other_process, on_connection_failed,
-                 on_connection_established, debug=False):
+    def __init__(self, debug=False):
 
         self.USER_PW: str = ""
         self.USER_NAME: str = ""
@@ -28,16 +27,21 @@ class ConnectorBackend:
         self.VPN_PUB_IP = ""
 
         self.child_process: pexpect.spawn = None
+        self.debug = debug
+
+    def setup(self, on_read_credentials_failed, on_already_connected_by_other_process,
+              on_connection_failed, on_connection_established):
+
         self.on_read_credentials_failed = on_read_credentials_failed
         self.on_already_connected_by_other_process = on_already_connected_by_other_process
         self.on_connection_failed = on_connection_failed
         self.on_connection_established = on_connection_established
-        self.debug = debug
 
     def stop_connection(self):
         if self.child_process is not None:
             self.child_process.kill(signal.SIGTERM)
             self.child_process.wait()
+            self.child_process = None
 
     def establish_connection(self, curr_ip):
         self.check_connection_status(curr_ip)
@@ -65,7 +69,6 @@ class ConnectorBackend:
             self.on_already_connected_by_other_process(curr_ip)
 
 
-
 if __name__ == "__main__":
     def on_success():
         print("SUCCESS - Connection established")
@@ -84,6 +87,7 @@ if __name__ == "__main__":
         print("Can not read credentials. Make sure they are provided as expected in the "
               "configure_connection.yaml\nExiting")
         exit(-1)
+
 
     connector = ConnectorBackend(read_credentials_failed, on_already_connected, on_failure, on_success, debug=True)
     read_credentials(connector)

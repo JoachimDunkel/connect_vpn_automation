@@ -134,11 +134,12 @@ def main():
               "configure_connection.yaml\nExiting")
         exit(-1)
 
-    connection_backend = ConnectorBackend(read_credentials_failed, on_already_connected, on_failure, on_success)
+    connection_backend = ConnectorBackend()
     read_credentials(connection_backend)
     app = VPNConnectorApp(on_disconnect_vpn=connection_backend.stop_connection,
                           on_connect_vpn=connection_backend.establish_connection)
 
+    connection_backend.setup(read_credentials_failed, on_already_connected, on_failure, on_success)
     connection_backend.check_connection_status(app.ip_info.ip_address)
 
     gtk.main()
