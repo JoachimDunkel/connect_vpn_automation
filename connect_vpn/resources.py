@@ -19,8 +19,13 @@ PATH_CREDENTIALS_FILE = PATH_ROOT_DIR / CREDENTIALS_FILE_NAME
 PATH_HOME_DIR = Path(os.path.expanduser('~'))
 PATH_BASH_ALIASES = PATH_HOME_DIR / '.bash_aliases'
 PATH_CONNECT_VPN = PATH_ROOT_DIR / 'connect_vpn'
-PATH_DATA_DIR = PATH_ROOT_DIR / 'data'
+PATH_DATA_DIR = PATH_CONNECT_VPN / 'data'
 PATH_IP2LOCATION_DB = PATH_DATA_DIR / 'IP2LOCATION-LITE-DB11.BIN'
+
+PATH_IMAGES = PATH_CONNECT_VPN / 'images'
+PATH_VPN_ICON_DISCONNECTED = PATH_IMAGES / 'key_white.png' #'vpn_shield.png'  # 'vpn_colored.png'# "connection_white.png" #'vpn_white.png'
+PATH_VPN_ICON_CONNECTED = PATH_IMAGES / 'key_green.png'
+PATH_VPN_ICON_FADED_OUT = PATH_IMAGES / 'key_faded_out.png'
 
 PATH_BIN_DIR = PATH_ROOT_DIR / 'bin'
 RUN_CONNECT_VPN_SCRIPT = './connect_vpn'

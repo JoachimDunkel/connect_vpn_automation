@@ -49,8 +49,8 @@ class VPNConnectorApp:
         self.application_status = ApplicationStatus.DISCONNECTED
         self.ip_info = IPInformation()
 
-        self.APPINDICATOR_ID = 'myappindicator'
-        self.app = appindicator.Indicator.new(self.APPINDICATOR_ID, os.path.abspath('sample_icon.svg'),
+        self.APPINDICATOR_ID = 'connect_vpn_indicator'
+        self.app = appindicator.Indicator.new(self.APPINDICATOR_ID, str(resources.PATH_VPN_ICON_DISCONNECTED),
                                               appindicator.IndicatorCategory.SYSTEM_SERVICES)
         self.app.set_status(appindicator.IndicatorStatus.ACTIVE)
         self.app.set_menu(self.build_app())
@@ -65,6 +65,7 @@ class VPNConnectorApp:
         self.perform_connection_change_btn_item.set_label(resources.STOP_CONNECTION)
         self.application_status = ApplicationStatus.CONNECTED
         self.change_connect_status_info()
+        self.app.set_icon(str(resources.PATH_VPN_ICON_CONNECTED))
 
     def on_disconnected(self):
         self.update_ip_information()
@@ -72,6 +73,7 @@ class VPNConnectorApp:
         self.perform_connection_change_btn_item.set_label(resources.ESTABLISH_CONNECTION)
         self.application_status = ApplicationStatus.DISCONNECTED
         self.change_connect_status_info()
+        self.app.set_icon(str(resources.PATH_VPN_ICON_DISCONNECTED))
 
     def on_other_process_holds_connection(self):
         msg = resources.OTHER_PROCESS_HOLDS_CONNECTION_FORMAT.format(self.ip_info.ip_address)
