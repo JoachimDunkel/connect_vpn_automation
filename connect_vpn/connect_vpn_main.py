@@ -8,6 +8,7 @@ gi.require_version('Notify', '0.7')
 from gi.repository import Gtk as gtk
 from gi.repository import AppIndicator3 as appindicator
 from gi.repository import Notify as notify
+from gi.repository import GLib
 from .check_ip import get_public_ip
 from . import resources
 from .resources import ApplicationStatus

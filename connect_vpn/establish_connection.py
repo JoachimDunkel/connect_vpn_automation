@@ -5,9 +5,6 @@ import signal
 import sys
 import pexpect
 
-from .check_ip import get_public_ip
-from .configuration_handler import read_credentials
-
 PR_SET_PDEATHSIG = 1
 
 
@@ -68,32 +65,3 @@ class ConnectorBackend:
     def check_connection_status(self, curr_ip):
         if curr_ip == self.VPN_PUB_IP:
             self.on_already_connected_by_other_process(curr_ip)
-
-
-if __name__ == "__main__":
-    def on_success():
-        print("SUCCESS - Connection established")
-
-
-    def on_failure():
-        print("FAILURE - Unable to establish connection.")
-
-
-    def on_already_connected(ip_address):
-        print("Your public ipv4 is: {} \nSeems like you already connected to the vpn.\nExiting ".format(ip_address))
-        exit(-1)
-
-
-    def read_credentials_failed():
-        print("Can not read credentials. Make sure they are provided as expected in the "
-              "configure_connection.yaml\nExiting")
-        exit(-1)
-
-    def on_connection_stopped():
-        print("Stopped connection")
-
-    connector = ConnectorBackend(debug=True)
-    connector.setup(read_credentials_failed, on_already_connected, on_failure, on_success, on_connection_stopped)
-    read_credentials(connector)
-    connector.establish_connection(get_public_ip())
-    connector.child_process.wait()
