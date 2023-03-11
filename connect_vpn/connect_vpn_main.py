@@ -14,6 +14,7 @@ from .resources import ApplicationStatus
 from .establish_connection import ConnectorBackend
 from .configuration_handler import read_credentials
 from .ip_info import IPInformation
+from .icon_status_handler import IconStatusHandler
 
 
 class VPNConnectorApp:
@@ -28,9 +29,14 @@ class VPNConnectorApp:
                                                AppIndicator3.IndicatorCategory.SYSTEM_SERVICES)
         self.app.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
         self.app.set_menu(self.build_app())
+
+        self.icon_status_handler = IconStatusHandler(self.app)
+
         notify.init(self.APPINDICATOR_ID)
 
     def request_connection(self):
+        self.notify_user("Connecting ... ")
+        self.icon_status_handler.on_establishing_connection()
         self.on_connect_vpn(self.ip_info.ip_address)
 
     def on_connected(self):
@@ -39,7 +45,7 @@ class VPNConnectorApp:
         self.perform_connection_change_btn_item.set_label(resources.STOP_CONNECTION)
         self.application_status = ApplicationStatus.CONNECTED
         self.change_connect_status_info()
-        self.app.set_icon(str(resources.PATH_VPN_ICON_CONNECTED))
+        self.icon_status_handler.on_connected()
 
     def on_disconnected(self):
         self.update_ip_information()
@@ -47,10 +53,10 @@ class VPNConnectorApp:
         self.perform_connection_change_btn_item.set_label(resources.ESTABLISH_CONNECTION)
         self.application_status = ApplicationStatus.DISCONNECTED
         self.change_connect_status_info()
-        self.app.set_icon(str(resources.PATH_VPN_ICON_DISCONNECTED))
+        self.icon_status_handler.on_disconnected()
 
-    def on_other_process_holds_connection(self):
-        msg = resources.OTHER_PROCESS_HOLDS_CONNECTION_FORMAT.format(self.ip_info.ip_address)
+    def on_other_process_holds_connection(self, ip):
+        msg = resources.OTHER_PROCESS_HOLDS_CONNECTION_FORMAT.format(ip)
         self.notify_user(msg)
         exit(-1)
 

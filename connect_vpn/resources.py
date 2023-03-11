@@ -23,9 +23,10 @@ PATH_DATA_DIR = PATH_CONNECT_VPN / 'data'
 PATH_IP2LOCATION_DB = PATH_DATA_DIR / 'IP2LOCATION-LITE-DB11.BIN'
 
 PATH_IMAGES = PATH_CONNECT_VPN / 'images'
-PATH_VPN_ICON_DISCONNECTED = PATH_IMAGES / 'key_white.png' #'vpn_shield.png'  # 'vpn_colored.png'# "connection_white.png" #'vpn_white.png'
+PATH_VPN_ICON_DISCONNECTED = PATH_IMAGES / 'key_white.png'
 PATH_VPN_ICON_CONNECTED = PATH_IMAGES / 'key_green.png'
-PATH_VPN_ICON_FADED_OUT = PATH_IMAGES / 'key_faded_out.png'
+PATH_VPN_ICON_ESTABLISH_CONNECTION_1 = PATH_IMAGES / "key_white.png"
+PATH_VPN_ICON_ESTABLISH_CONNECTION_2 = PATH_IMAGES / 'grey_green.png'
 
 PATH_BIN_DIR = PATH_ROOT_DIR / 'bin'
 RUN_CONNECT_VPN_SCRIPT = './connect_vpn'
@@ -44,8 +45,7 @@ STOP_CONNECTION = 'Disconnect from VPN'
 ESTABLISHED_CONNECTION_FORMAT = 'Established connection to: {}'
 STOPPED_CONNECTION = 'Stopped vpn connection.'
 
-OTHER_PROCESS_HOLDS_CONNECTION_FORMAT = "Your public ipv4 is: {} \nSeems like you already connected to the " \
-                                        "vpn.\nExiting"
+OTHER_PROCESS_HOLDS_CONNECTION_FORMAT = "Your ip: {} \n You are already connected.\nExiting"
 
 READING_CREDENTIALS_FAILED = "Can not read credentials. Make sure they are provided as expected in the " \
                              "configure_connection.yaml\nExiting"
