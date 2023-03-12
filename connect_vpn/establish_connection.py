@@ -69,6 +69,9 @@ class ConnectorBackend:
 
     def establish_connection(self, curr_ip):
         self.check_connection_status(curr_ip)
+
+        # For some reason the vpn connection does not work if pexpect spawns the child process inside a thread
+        # (that's why it is not inside _connect_task) ??
         self.child_process = pexpect.spawn(self.config.OPENVPN_SCRIPT_PATH, preexec_fn=_set_pdeathsig)
         if self.debug:
             self.child_process.logfile = sys.stdout.buffer

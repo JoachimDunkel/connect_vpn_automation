@@ -11,11 +11,13 @@ def _path_to_project_root(project_name):
     return path
 
 
-CREDENTIALS_FILE_NAME = 'configure_connection.yaml'
 PROJECT_ROOT_NAME = 'connect_vpn_automation'
 PATH_ROOT_DIR = Path(_path_to_project_root(PROJECT_ROOT_NAME))
+PATH_CONFIG_DIR = PATH_ROOT_DIR / 'config'
 PATH_SRC = PATH_ROOT_DIR / 'connect_vpn'
-PATH_CREDENTIALS_FILE = PATH_ROOT_DIR / CREDENTIALS_FILE_NAME
+PATH_CREDENTIALS_FILE = PATH_CONFIG_DIR / 'configure_connection.yaml'
+PATH_USER_SETTINGS_FILE = PATH_CONFIG_DIR / 'user_settings.yaml'
+
 PATH_HOME_DIR = Path(os.path.expanduser('~'))
 PATH_BASH_ALIASES = PATH_HOME_DIR / '.bash_aliases'
 PATH_CONNECT_VPN = PATH_ROOT_DIR / 'connect_vpn'

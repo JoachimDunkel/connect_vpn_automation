@@ -10,13 +10,13 @@ except ImportError:
     import connect_vpn
 
 from connect_vpn.common import resources
-from connect_vpn.configuration_handler import ensure_configuration_exists
+from connect_vpn.configuration_handler import ensure_configuration_exists, CONFIGURATION_FORMAT
 
 # This will add the command connect_vpn to ~/.bash_aliases If running connect_vpn does not work yet source your
 # terminal or make sure bash_aliases is uncommented in your ~/.bashrc
 
 print("Creating the configuration for you to fill out.")
-ensure_configuration_exists()
+ensure_configuration_exists(str(resources.PATH_CREDENTIALS_FILE), CONFIGURATION_FORMAT)
 print("Adding 'connect_vpn' command to ~/.bash_aliases")
 
 alias_cmd = '\nalias connect_vpn="cd {} && {}"'.format(str(resources.PATH_BIN_DIR), str(

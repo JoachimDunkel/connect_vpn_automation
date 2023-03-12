@@ -6,6 +6,6 @@
 
 connect_vpn/__pycache__/
 
-configure_connection.yaml
+config/configure_connection.yaml
 
 connect_vpn/common/__pycache__/

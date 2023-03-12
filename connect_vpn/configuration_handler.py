@@ -2,7 +2,7 @@ from .common import resources as res
 import os
 import yaml
 
-_CONFIGURATION_FORMAT = {
+CONFIGURATION_FORMAT = {
     'SUDO_PW': '',
     'USER_NAME': '',
     'USER_PW': '',
@@ -11,11 +11,11 @@ _CONFIGURATION_FORMAT = {
 }
 
 
-def ensure_configuration_exists():
+def ensure_configuration_exists(config_path, config_format):
     created_anew = False
-    if not os.path.exists(str(res.PATH_CREDENTIALS_FILE)):
-        with open(res.PATH_CREDENTIALS_FILE, 'w') as file:
-            yaml.dump(_CONFIGURATION_FORMAT, file)
+    if not os.path.exists(config_path):
+        with open(config_path, 'w') as file:
+            yaml.dump(config_format, file)
 
         created_anew = True
     return created_anew
