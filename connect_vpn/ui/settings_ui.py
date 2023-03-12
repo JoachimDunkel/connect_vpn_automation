@@ -18,10 +18,12 @@ class SettingsWindow:
         }
 
     def on_quit(self, btn):
+        self.window.destroy()
         print("Quit")
 
     def on_ok(self, btn):
         self.user_settings.saver_user_changes()
+        self.window.destroy()
         print("Ok")
 
     def on_apply(self, btn):
