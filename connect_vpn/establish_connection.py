@@ -4,6 +4,7 @@ import getpass
 import signal
 import sys
 import pexpect
+from .common.background_task import BackgroundTask
 
 PR_SET_PDEATHSIG = 1
 
@@ -36,15 +37,23 @@ class ConnectorBackend:
         self.on_connection_stopped = on_connection_stopped
 
     def stop_connection(self):
-        if self.child_process is not None:
-            self.child_process.kill(signal.SIGTERM)
-            self.child_process.wait()
-            self.child_process = None
+        self.ensure_child_stopped()
         self.on_connection_stopped()
 
-    def establish_connection(self, curr_ip):
-        self.check_connection_status(curr_ip)
+    def handle_connection_failed(self):
+        self.ensure_child_stopped()
+        self.on_connection_failed()
 
+    def ensure_child_stopped(self):
+        if self.child_process is not None:
+            try:
+                self.child_process.close()
+            except Exception as _:
+                self.child_process.kill(signal.SIGTERM)
+            self.child_process.wait()
+            self.child_process = None
+
+    def _connect(self, args):
         self.child_process = pexpect.spawn(self.OPENVPN_SCRIPT_PATH, preexec_fn=_set_pdeathsig)
         if self.debug:
             self.child_process.logfile = sys.stdout.buffer
@@ -55,12 +64,13 @@ class ConnectorBackend:
         self.child_process.sendline(self.USER_NAME)
         self.child_process.expect_exact('Enter Auth Password: ')
         self.child_process.sendline(self.USER_PW)
+        self.child_process.expect_exact('Initialization Sequence Completed')
 
-        try:
-            self.child_process.expect_exact('Initialization Sequence Completed')
-            self.on_connection_established()
-        except Exception as e:
-            self.on_connection_failed(e)
+    def establish_connection(self, curr_ip):
+        self.check_connection_status(curr_ip)
+        self.connect_task = BackgroundTask(self._connect, [], on_succeeded=self.on_connection_established,
+                                           on_failed=self.handle_connection_failed)
+        self.connect_task.start()
 
     def check_connection_status(self, curr_ip):
         if curr_ip == self.VPN_PUB_IP:

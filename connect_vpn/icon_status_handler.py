@@ -25,7 +25,6 @@ class IconStatusHandler:
         self.blink_period = 1
 
     def on_connected(self):
-        print("ICON-STATUS-HANDLER RECEIVING CONNECTED")
         self.blink_icon = False
         self.update_icon_status(IconStatus.CONNECTED)
         self.update_icon()
@@ -36,11 +35,9 @@ class IconStatusHandler:
 
     def update_icon_status(self, status: IconStatus):
         self.icon_status = status
-        print(str(self.icon_status))
         self.icon_img = self.get_icon_img()
 
     def update_icon(self):
-        print("GLIB UPDATE")
         self.app.set_icon(self.icon_img)
         return self.blink_icon
 
@@ -67,7 +64,6 @@ class IconStatusHandler:
             time.sleep(self.blink_period)
 
     def on_establishing_connection(self):
-        print("ICON-STATUS-HANDLER ESTABLISHING CONNECTION")
         self.blink_icon = True
         GLib.timeout_add_seconds(self.blink_period, self.update_icon)
         thread = threading.Thread(target=self.blink_icon_task)
