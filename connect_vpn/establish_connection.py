@@ -4,7 +4,7 @@ import getpass
 import signal
 import sys
 import pexpect
-from .common.background_task import BackgroundTask
+from .common.background_task import CallbackTask
 
 PR_SET_PDEATHSIG = 1
 
@@ -68,8 +68,8 @@ class ConnectorBackend:
 
     def establish_connection(self, curr_ip):
         self.check_connection_status(curr_ip)
-        self.connect_task = BackgroundTask(self._connect, [], on_succeeded=self.on_connection_established,
-                                           on_failed=self.handle_connection_failed)
+        self.connect_task = CallbackTask(self._connect, [], on_succeeded=self.on_connection_established,
+                                         on_failed=self.handle_connection_failed)
         self.connect_task.start()
 
     def check_connection_status(self, curr_ip):
