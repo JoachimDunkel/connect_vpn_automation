@@ -1,2 +1,2 @@
 auto_connect_when_launched: true
-suppress_notifications: true
+suppress_notifications: false
