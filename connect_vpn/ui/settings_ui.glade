@@ -90,6 +90,19 @@
             <property name="y">10</property>
           </packing>
         </child>
+        <child>
+          <object class="GtkCheckButton" id="suppress_notifications_checkbox">
+            <property name="label" translatable="yes">Supress notifications</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">False</property>
+            <property name="draw_indicator">True</property>
+            <signal name="toggled" handler="on_supress_notifications_toggled" swapped="no"/>
+          </object>
+          <packing>
+            <property name="y">40</property>
+          </packing>
+        </child>
       </object>
     </child>
   </object>

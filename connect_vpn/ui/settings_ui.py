@@ -17,6 +17,7 @@ class SettingsWindow:
             "on_apply_btn_clicked": self.on_apply,
             "on_ok_btn_clicked": self.on_ok,
             "auto_connect_on_launch_toggled": self.on_auto_connect_toggled,
+            "on_supress_notifications_toggled": self.on_suppress_notifications_toggled
         }
         self.showing_window = False
 
@@ -35,6 +36,9 @@ class SettingsWindow:
     def on_auto_connect_toggled(self, check_btn):
         self.user_settings.auto_connect_when_launched = check_btn.get_active()
 
+    def on_suppress_notifications_toggled(self, check_btn):
+        self.user_settings.suppress_notifications = check_btn.get_active()
+
     def on_window_closed(self, caller, event):
         self.showing_window = False
         self.on_settings_closed()
@@ -50,6 +54,9 @@ class SettingsWindow:
 
         auto_connect_on_launch_check_box = builder.get_object('auto_connect_when_launched_check_box')
         auto_connect_on_launch_check_box.set_active(self.user_settings.auto_connect_when_launched)
+
+        suppress_notifications_check_box = builder.get_object('suppress_notifications_checkbox')
+        suppress_notifications_check_box.set_active(self.user_settings.suppress_notifications)
 
         self.window = builder.get_object("settings_window")
         self.window.set_title("VPN - Connect")
