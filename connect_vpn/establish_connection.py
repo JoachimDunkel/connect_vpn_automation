@@ -38,14 +38,16 @@ class ConnectorBackend:
         self.on_connection_failed = on_connection_failed
         self.on_connection_established = on_connection_established
         self.on_connection_stopped = on_connection_stopped
+        self.connect_task = CallbackTask(self._connect_task, [], on_succeeded=self.on_connection_established,
+                                         on_failed=self.handle_connection_failed)
 
     def stop_connection(self):
         self.ensure_child_stopped()
         self.on_connection_stopped()
 
-    def handle_connection_failed(self):
+    def handle_connection_failed(self, exception):
         self.ensure_child_stopped()
-        self.on_connection_failed()
+        self.on_connection_failed(exception)
 
     def ensure_child_stopped(self):
         if self.child_process is not None:
@@ -56,11 +58,7 @@ class ConnectorBackend:
             self.child_process.wait()
             self.child_process = None
 
-    def _connect(self, args):
-        self.child_process = pexpect.spawn(self.config.OPENVPN_SCRIPT_PATH, preexec_fn=_set_pdeathsig)
-        if self.debug:
-            self.child_process.logfile = sys.stdout.buffer
-
+    def _connect_task(self, args):
         self.child_process.expect_exact('[sudo] password for {}: '.format(getpass.getuser()))
         self.child_process.sendline(self.config.SUDO_PW)
         self.child_process.expect_exact('Enter Auth Username: ')
@@ -71,8 +69,9 @@ class ConnectorBackend:
 
     def establish_connection(self, curr_ip):
         self.check_connection_status(curr_ip)
-        self.connect_task = CallbackTask(self._connect, [], on_succeeded=self.on_connection_established,
-                                         on_failed=self.handle_connection_failed)
+        self.child_process = pexpect.spawn(self.config.OPENVPN_SCRIPT_PATH, preexec_fn=_set_pdeathsig)
+        if self.debug:
+            self.child_process.logfile = sys.stdout.buffer
         self.connect_task.start()
 
     def check_connection_status(self, curr_ip):
