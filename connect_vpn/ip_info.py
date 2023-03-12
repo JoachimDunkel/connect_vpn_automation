@@ -1,4 +1,4 @@
-from . import resources
+from .common import resources
 from .check_ip import get_public_ip
 import IP2Location
 class IPInformation:

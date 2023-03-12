@@ -9,8 +9,8 @@ from gi.repository import Gtk as gtk
 from gi.repository import AppIndicator3
 from gi.repository import Notify as notify
 
-from . import resources
-from .resources import ApplicationStatus
+from connect_vpn.common import resources
+from connect_vpn.common.resources import ApplicationStatus
 from .establish_connection import ConnectorBackend
 from .configuration_handler import read_credentials
 from .ip_info import IPInformation

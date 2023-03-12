@@ -1,4 +1,4 @@
-from . import resources as res
+from .common import resources as res
 import os
 import yaml
 

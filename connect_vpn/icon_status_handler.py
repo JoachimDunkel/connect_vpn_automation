@@ -1,7 +1,5 @@
 from gi.repository import AppIndicator3, GLib
-from . import resources
-import threading
-import time
+from .common import resources
 
 import threading
 import time

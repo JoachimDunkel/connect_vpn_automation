@@ -4,7 +4,7 @@ import getpass
 import signal
 import sys
 import pexpect
-from .common.background_task import CallbackTask
+from .common.tasks import CallbackTask
 
 PR_SET_PDEATHSIG = 1
 

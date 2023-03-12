@@ -9,7 +9,7 @@ except ImportError:
     sys.path.append(abspath(join(dirname(__file__), '..')))
     import connect_vpn
 
-from connect_vpn import resources
+from connect_vpn.common import resources
 from connect_vpn.configuration_handler import ensure_configuration_exists
 
 # This will add the command connect_vpn to ~/.bash_aliases If running connect_vpn does not work yet source your
@@ -19,7 +19,8 @@ print("Creating the configuration for you to fill out.")
 ensure_configuration_exists()
 print("Adding 'connect_vpn' command to ~/.bash_aliases")
 
-alias_cmd = '\nalias connect_vpn="cd {} && {}"'.format(str(resources.PATH_BIN_DIR), str(resources.RUN_CONNECT_VPN_SCRIPT))
+alias_cmd = '\nalias connect_vpn="cd {} && {}"'.format(str(resources.PATH_BIN_DIR), str(
+    resources.RUN_CONNECT_VPN_SCRIPT))
 with open(str(resources.PATH_BASH_ALIASES), "a") as bash_aliases:
     bash_aliases.write(alias_cmd)
 
