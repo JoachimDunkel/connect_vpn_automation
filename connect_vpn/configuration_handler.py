@@ -32,7 +32,7 @@ def _ensure_config_value_provided(source_param, failure_msg):
 
 
 def read_credentials(connection_backend):
-    created_anew = ensure_configuration_exists()
+    created_anew = ensure_configuration_exists(str(res.PATH_CREDENTIALS_FILE), CONFIGURATION_FORMAT)
     if created_anew:
         print("Please fill out all the necessary credentials for your openvpn-login in:\n{}\n".format(
             res.PATH_CREDENTIALS_FILE))

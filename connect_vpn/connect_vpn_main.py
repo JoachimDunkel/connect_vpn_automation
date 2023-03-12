@@ -1,14 +1,13 @@
 import signal
-
 import gi
-
 gi.require_version('Gtk', '3.0')
 gi.require_version('AppIndicator3', '0.1')
 gi.require_version('Notify', '0.7')
 from gi.repository import Gtk as gtk
 from gi.repository import AppIndicator3
 from gi.repository import Notify as notify
-
+from gi.repository import GLib
+from connect_vpn.ui.settings_ui import SettingsWindow
 from connect_vpn.common import resources
 from connect_vpn.common.resources import ApplicationStatus
 from .establish_connection import ConnectorBackend
@@ -29,7 +28,7 @@ class VPNConnectorApp:
                                                AppIndicator3.IndicatorCategory.SYSTEM_SERVICES)
         self.app.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
         self.app.set_menu(self.build_app())
-
+        self.settings_window = SettingsWindow(self.app, self.quit_application, self.unlock)
         self.icon_status_handler = IconStatusHandler(self.app)
 
         notify.init(self.APPINDICATOR_ID)
@@ -97,30 +96,42 @@ class VPNConnectorApp:
         self.ip_addr_item.set_label(self.ip_info.get_ip_address())
         self.ip_details_item.set_label(self.ip_info.get_ip_details())
 
+    def open_settings(self, btn):
+        self.lock()
+        self.settings_window.show()
+
+    def quit_application(self):
+        self.request_disconnection()
+        gtk.main_quit()
+
+    def lock(self):
+        self.perform_connection_change_btn_item.set_sensitive(False)
+        self.open_settings_menu_item.set_sensitive(False)
+
+    def unlock(self):
+        self.perform_connection_change_btn_item.set_sensitive(True)
+        self.open_settings_menu_item.set_sensitive(True)
+
     def build_app(self):
         self.menu = gtk.Menu()
         self.ip_addr_item = gtk.MenuItem(label=self.ip_info.get_ip_address(), sensitive=False)
         self.ip_details_item = gtk.MenuItem(label=self.ip_info.get_ip_details(), sensitive=False)
-
-        self.separator = gtk.SeparatorMenuItem()
 
         self.connection_status_label = ApplicationStatus.DISCONNECTED.name
         self.connection_status_menu_item = gtk.MenuItem(label=self.connection_status_label, sensitive=False)
         self.perform_connection_change_btn_item = gtk.MenuItem(label=resources.ESTABLISH_CONNECTION)
         self.perform_connection_change_btn_item.connect("activate", self.toggle_vpn_connection)
 
-        # TODO when the button is clicked then update the ip information and the connect btn label appropriatly.
-        # While transitioning notify that a connection will be established.
-        # https://stackoverflow.com/questions/52887891/how-to-periodically-update-gtk3-label-text -> periodically update a label (the ip address) # not necessary maybe.
-        # We can also check the specified ip address to get the connection status.
+        self.open_settings_menu_item = gtk.MenuItem(label=resources.SETTINGS_BTN_LABEL)
+        self.open_settings_menu_item.connect('activate', self.open_settings)
 
         self.menu.append(self.ip_addr_item)
         self.menu.append(self.ip_details_item)
-
         self.menu.append(self.connection_status_menu_item)
-        self.menu.append(self.separator)
+        self.menu.append(gtk.SeparatorMenuItem())
         self.menu.append(self.perform_connection_change_btn_item)
-
+        self.menu.append(gtk.SeparatorMenuItem())
+        self.menu.append(self.open_settings_menu_item)
         self.menu.show_all()
         return self.menu
 
@@ -136,6 +147,7 @@ def main():
     connection_backend.setup(app.on_read_credentials_failed, app.on_other_process_holds_connection,
                              app.on_other_connection_failure, app.on_connected, app.on_disconnected)
     connection_backend.check_connection_status(app.ip_info.ip_address)
+    app.notify_user("Started VPN - Connector")
     gtk.main()
 
 
