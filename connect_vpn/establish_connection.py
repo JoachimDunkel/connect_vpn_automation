@@ -15,15 +15,18 @@ def _set_pdeathsig():
         raise OSError(ctypes.get_errno(), 'SET_PDEATHSIG')
 
 
-class ConnectorBackend:
-    def __init__(self, debug=False):
-
+class ConnectionConfiguration:
+    def __init__(self):
         self.USER_PW: str = ""
         self.USER_NAME: str = ""
         self.SUDO_PW: str = ""
         self.OPENVPN_SCRIPT_PATH: str = ""
         self.VPN_PUB_IP = ""
 
+
+class ConnectorBackend:
+    def __init__(self, debug=False):
+        self.config = ConnectionConfiguration()
         self.child_process: pexpect.spawn = None
         self.debug = debug
 
@@ -54,16 +57,16 @@ class ConnectorBackend:
             self.child_process = None
 
     def _connect(self, args):
-        self.child_process = pexpect.spawn(self.OPENVPN_SCRIPT_PATH, preexec_fn=_set_pdeathsig)
+        self.child_process = pexpect.spawn(self.config.OPENVPN_SCRIPT_PATH, preexec_fn=_set_pdeathsig)
         if self.debug:
             self.child_process.logfile = sys.stdout.buffer
 
         self.child_process.expect_exact('[sudo] password for {}: '.format(getpass.getuser()))
-        self.child_process.sendline(self.SUDO_PW)
+        self.child_process.sendline(self.config.SUDO_PW)
         self.child_process.expect_exact('Enter Auth Username: ')
-        self.child_process.sendline(self.USER_NAME)
+        self.child_process.sendline(self.config.USER_NAME)
         self.child_process.expect_exact('Enter Auth Password: ')
-        self.child_process.sendline(self.USER_PW)
+        self.child_process.sendline(self.config.USER_PW)
         self.child_process.expect_exact('Initialization Sequence Completed')
 
     def establish_connection(self, curr_ip):
@@ -73,5 +76,5 @@ class ConnectorBackend:
         self.connect_task.start()
 
     def check_connection_status(self, curr_ip):
-        if curr_ip == self.VPN_PUB_IP:
+        if curr_ip == self.config.VPN_PUB_IP:
             self.on_already_connected_by_other_process(curr_ip)

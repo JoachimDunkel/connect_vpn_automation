@@ -31,7 +31,7 @@ def _ensure_config_value_provided(source_param, failure_msg):
     return source_param
 
 
-def read_credentials(vpn_connector):
+def read_credentials(connection_backend):
     created_anew = ensure_configuration_exists()
     if created_anew:
         print("Please fill out all the necessary credentials for your openvpn-login in:\n{}\n".format(
@@ -42,11 +42,11 @@ def read_credentials(vpn_connector):
         try:
             credentials = yaml.safe_load(stream)
 
-            vpn_connector.VPN_PUB_IP = _ensure_config_value_provided(credentials['VPN_PUB_IP'], "Please provide the expected ipv4 address of your desired vpn to: VPN_PUB_IP")
-            vpn_connector.OPENVPN_SCRIPT_PATH = _ensure_config_value_provided(credentials['OPENVPN_SCRIPT_PATH'], "Please provide a correct path to your openvpn-script to: OPENVPN_SCRIPT_PATH")
-            vpn_connector.SUDO_PW = _ensure_config_value_provided(credentials['SUDO_PW'], "Please provide a correct sudo-pw to: SUDO_PW")
-            vpn_connector.USER_NAME = _ensure_config_value_provided(credentials['USER_NAME'], "Please provide the correct username to your openvpn login to: USER_NAME")
-            vpn_connector.USER_PW = _ensure_config_value_provided(credentials['USER_PW'], "Please provide the correct password to your openvpn login to: USER_PW")
+            connection_backend.config.VPN_PUB_IP = _ensure_config_value_provided(credentials['VPN_PUB_IP'], "Please provide the expected ipv4 address of your desired vpn to: VPN_PUB_IP")
+            connection_backend.config.OPENVPN_SCRIPT_PATH = _ensure_config_value_provided(credentials['OPENVPN_SCRIPT_PATH'], "Please provide a correct path to your openvpn-script to: OPENVPN_SCRIPT_PATH")
+            connection_backend.config.SUDO_PW = _ensure_config_value_provided(credentials['SUDO_PW'], "Please provide a correct sudo-pw to: SUDO_PW")
+            connection_backend.config.USER_NAME = _ensure_config_value_provided(credentials['USER_NAME'], "Please provide the correct username to your openvpn login to: USER_NAME")
+            connection_backend.config.USER_PW = _ensure_config_value_provided(credentials['USER_PW'], "Please provide the correct password to your openvpn login to: USER_PW")
 
         except yaml.YAMLError as e:
-            vpn_connector.on_read_credentials_failed()
+            connection_backend.on_read_credentials_failed()
