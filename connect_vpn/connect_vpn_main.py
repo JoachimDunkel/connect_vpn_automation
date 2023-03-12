@@ -1,5 +1,6 @@
 import signal
 import gi
+
 gi.require_version('Gtk', '3.0')
 gi.require_version('AppIndicator3', '0.1')
 gi.require_version('Notify', '0.7')
@@ -34,11 +35,13 @@ class VPNConnectorApp:
         notify.init(self.APPINDICATOR_ID)
 
     def request_connection(self):
+        self.lock()
         self.notify_user("Connecting ... ")
         self.icon_status_handler.on_establishing_connection()
         self.on_connect_vpn(self.ip_info.ip_address)
 
     def on_connected(self):
+        self.unlock()
         self.update_ip_information()
         self.notify_user(resources.ESTABLISHED_CONNECTION_FORMAT.format(self.ip_info.ip_address))
         self.perform_connection_change_btn_item.set_label(resources.STOP_CONNECTION)
@@ -68,9 +71,9 @@ class VPNConnectorApp:
         print(resources.READING_CREDENTIALS_FAILED)
         exit(-1)
 
-    @staticmethod
-    def notify_user(msg):
-        notify.Notification.new(msg, None).show()
+    def notify_user(self, msg):
+        if not self.settings_window.user_settings.suppress_notifications:
+            notify.Notification.new(msg, None).show()
 
     def request_disconnection(self):
         self.on_disconnect_vpn()
@@ -135,6 +138,10 @@ class VPNConnectorApp:
         self.menu.show_all()
         return self.menu
 
+    def initialize(self):
+        self.notify_user("Started VPN - Connector")
+        if self.settings_window.user_settings.auto_connect_when_launched:
+            GLib.idle_add(self.request_connection)
 
 def main():
     signal.signal(signal.SIGINT, signal.SIG_DFL)
@@ -147,7 +154,9 @@ def main():
     connection_backend.setup(app.on_read_credentials_failed, app.on_other_process_holds_connection,
                              app.on_other_connection_failure, app.on_connected, app.on_disconnected)
     connection_backend.check_connection_status(app.ip_info.ip_address)
-    app.notify_user("Started VPN - Connector")
+
+    app.initialize()
+
     gtk.main()
 
 
