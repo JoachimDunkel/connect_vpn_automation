@@ -38,8 +38,8 @@ class ConnectorBackend:
         self.on_connection_failed = on_connection_failed
         self.on_connection_established = on_connection_established
         self.on_connection_stopped = on_connection_stopped
-        self.connect_task = CallbackTask(self._connect_task, [], on_succeeded=self.on_connection_established,
-                                         on_failed=self.handle_connection_failed)
+        # self.connect_task = CallbackTask(self._connect_task, [], on_succeeded=self.on_connection_established,
+        #                                  on_failed=self.handle_connection_failed)
 
     def stop_connection(self):
         self.ensure_child_stopped()
@@ -75,6 +75,9 @@ class ConnectorBackend:
         self.child_process = pexpect.spawn(self.config.OPENVPN_SCRIPT_PATH, preexec_fn=_set_pdeathsig)
         if self.debug:
             self.child_process.logfile = sys.stdout.buffer
+
+        self.connect_task = CallbackTask(self._connect_task, [], on_succeeded=self.on_connection_established,
+                                         on_failed=self.handle_connection_failed)
         self.connect_task.start()
 
     def check_connection_status(self, curr_ip):
