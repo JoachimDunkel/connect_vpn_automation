@@ -14,6 +14,7 @@ from connect_vpn.common import resources
 from connect_vpn.configuration_handler import ensure_configuration_exists, CONFIGURATION_FORMAT
 
 
+# TODO this should be automatically done with setup.py when installing with pipy.
 def place_the_desktop_file():
     destination = str(resources.PATH_USR_LOCAL_SHARE)
     source = str(resources.PATH_LAUNCH_DESKTOP_FILE)

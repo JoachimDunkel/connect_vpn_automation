@@ -7,23 +7,17 @@ from connect_vpn.common import resources
 
 
 class SettingsWindow:
-    def __init__(self, app_indicator, on_request_application_quit, on_settings_closed):
+    def __init__(self, app_indicator, on_settings_closed):
         self.app_indicator = app_indicator
-        self.on_request_application_quit = on_request_application_quit
         self.on_settings_closed = on_settings_closed
         self.user_settings = UserSettings()
         self.handlers = {
-            "on_quit_btn_clicked": self.on_quit,
             "on_apply_btn_clicked": self.on_apply,
             "on_ok_btn_clicked": self.on_ok,
             "auto_connect_on_launch_toggled": self.on_auto_connect_toggled,
             "on_supress_notifications_toggled": self.on_suppress_notifications_toggled
         }
         self.showing_window = False
-
-    def on_quit(self, btn):
-        self.window.close()
-        self.on_request_application_quit()
 
     def on_ok(self, btn):
         self.user_settings.saver_user_changes()
@@ -68,14 +62,10 @@ class SettingsWindow:
 
 if __name__ == "__main__":
 
-    def request_application_quit():
-        print("Requesting app to quit")
-        Gtk.main_quit()
-
     def on_settings_window_closed():
         print("Settings window closed")
         Gtk.main_quit()
 
-    settings_window = SettingsWindow(None, request_application_quit, on_settings_window_closed)
+    settings_window = SettingsWindow(None, on_settings_window_closed)
     settings_window.show()
     Gtk.main()

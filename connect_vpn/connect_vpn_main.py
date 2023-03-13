@@ -29,7 +29,7 @@ class VPNConnectorApp:
                                                AppIndicator3.IndicatorCategory.SYSTEM_SERVICES)
         self.app.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
         self.app.set_menu(self.build_app())
-        self.settings_window = SettingsWindow(self.app, self.quit_application, self.unlock)
+        self.settings_window = SettingsWindow(self.app, self.unlock)
         self.icon_status_handler = IconStatusHandler(self.app)
 
         notify.init(self.APPINDICATOR_ID)
@@ -103,7 +103,7 @@ class VPNConnectorApp:
         self.lock()
         self.settings_window.show()
 
-    def quit_application(self):
+    def quit_application(self, btn):
         self.request_disconnection()
         gtk.main_quit()
 
@@ -128,6 +128,9 @@ class VPNConnectorApp:
         self.open_settings_menu_item = gtk.MenuItem(label=resources.SETTINGS_BTN_LABEL)
         self.open_settings_menu_item.connect('activate', self.open_settings)
 
+        self.quit_app_menu_item = gtk.MenuItem(label="Quit")
+        self.quit_app_menu_item.connect('activate', self.quit_application)
+
         self.menu.append(self.ip_addr_item)
         self.menu.append(self.ip_details_item)
         self.menu.append(self.connection_status_menu_item)
@@ -135,6 +138,8 @@ class VPNConnectorApp:
         self.menu.append(self.perform_connection_change_btn_item)
         self.menu.append(gtk.SeparatorMenuItem())
         self.menu.append(self.open_settings_menu_item)
+        self.menu.append(gtk.SeparatorMenuItem())
+        self.menu.append(self.quit_app_menu_item)
         self.menu.show_all()
         return self.menu
 
@@ -147,7 +152,7 @@ class VPNConnectorApp:
 def main():
     signal.signal(signal.SIGINT, signal.SIG_DFL)
 
-    connection_backend = ConnectorBackend()
+    connection_backend = ConnectorBackend(debug=False)
     read_credentials(connection_backend)
     app = VPNConnectorApp(on_disconnect_vpn=connection_backend.stop_connection,
                           on_connect_vpn=connection_backend.establish_connection)
