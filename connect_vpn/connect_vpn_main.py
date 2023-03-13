@@ -143,6 +143,7 @@ class VPNConnectorApp:
         if self.settings_window.user_settings.auto_connect_when_launched:
             GLib.idle_add(self.request_connection)
 
+
 def main():
     signal.signal(signal.SIGINT, signal.SIG_DFL)
 

@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type = Application
+Name = Connect-VPN
+Comment = Connect and monitor script based openvpn connection with an easy to use intuitive gui
+Exec = check_ip
+Icon = path-to-icon

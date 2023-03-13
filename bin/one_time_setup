@@ -2,6 +2,7 @@
 
 import sys
 from os.path import abspath, dirname, join
+import shutil
 
 try:
     import connect_vpn
@@ -12,17 +13,28 @@ except ImportError:
 from connect_vpn.common import resources
 from connect_vpn.configuration_handler import ensure_configuration_exists, CONFIGURATION_FORMAT
 
-# This will add the command connect_vpn to ~/.bash_aliases If running connect_vpn does not work yet source your
-# terminal or make sure bash_aliases is uncommented in your ~/.bashrc
 
-print("Creating the configuration for you to fill out.")
-ensure_configuration_exists(str(resources.PATH_CREDENTIALS_FILE), CONFIGURATION_FORMAT)
-print("Adding 'connect_vpn' command to ~/.bash_aliases")
+def place_the_desktop_file():
+    destination = str(resources.PATH_USR_LOCAL_SHARE)
+    source = str(resources.PATH_LAUNCH_DESKTOP_FILE)
+    shutil.copyfile(source, destination)
+    print("Added launch icon")
 
-alias_cmd = '\nalias connect_vpn="cd {} && {}"'.format(str(resources.PATH_BIN_DIR), str(
-    resources.RUN_CONNECT_VPN_SCRIPT))
-with open(str(resources.PATH_BASH_ALIASES), "a") as bash_aliases:
-    bash_aliases.write(alias_cmd)
 
-print("Wrote:{}\n".format(alias_cmd))
-print("DONE. To run just type 'connect_vpn' into a terminal.")
+def setup_configuration():
+    print("Creating the configuration for you to fill out.")
+    ensure_configuration_exists(str(resources.PATH_CREDENTIALS_FILE), CONFIGURATION_FORMAT)
+    print("Adding 'connect_vpn' command to ~/.bash_aliases")
+
+
+def creating_alias():
+    alias_cmd = '\nalias connect_vpn="cd {} && {}"'.format(str(resources.PATH_BIN_DIR), str(
+        resources.RUN_CONNECT_VPN_SCRIPT))
+    with open(str(resources.PATH_BASH_ALIASES), "a") as bash_aliases:
+        bash_aliases.write(alias_cmd)
+
+    print("Wrote:{}\n".format(alias_cmd))
+    print("DONE. To run just type 'connect_vpn' into a terminal.")
+
+
+place_the_desktop_file()
